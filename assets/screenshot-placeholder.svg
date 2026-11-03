@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420">
+  <rect width="960" height="420" rx="24" fill="#f7ead7"/>
+  <path d="M0 305h960v115H0z" fill="#e6c6a2"/>
+  <circle cx="480" cy="224" r="132" fill="#fffaf0" stroke="#b6a38b" stroke-width="8"/>
+  <circle cx="480" cy="214" r="102" fill="#f5f0e2"/>
+  <path d="M408 203c16-34 46-33 69-10 23-38 59-22 72 8 11 25-2 50-17 63H420c-18-15-24-38-12-61Z" fill="#9c5e3c"/>
+  <path d="M420 252c21 17 42-5 58-19 18 20 42 21 66 8" fill="none" stroke="#d76b55" stroke-linecap="round" stroke-width="12"/>
+  <path d="M450 163c5-23 27-29 38-15m15 17c7-21 27-23 37-8" fill="none" stroke="#718153" stroke-linecap="round" stroke-width="9"/>
+  <text x="480" y="385" text-anchor="middle" fill="#3d3932" font-family="Georgia,serif" font-size="25">Your bowl, ready to serve</text>
+</svg>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6efe3">
+  <meta name="description" content="A cozy, hands-on gyudon cooking game. Learn the ingredients and make a Japanese beef bowl, one step at a time.">
+  <title>Gyudon Kitchen</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Gyudon Kitchen home">
+        <span class="brand-mark" aria-hidden="true">丼</span>
+        <span>GYUDON <b>KITCHEN</b></span>
+      </a>
+      <div class="top-actions">
+        <button class="icon-button" id="sound-toggle" type="button" aria-label="Turn sound on" aria-pressed="false" title="Sound off">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4H4Z"/><path d="m17 9 5 6m0-6-5 6"/></svg>
+        </button>
+        <span class="top-note">A little bowl of comfort</span>
+      </div>
+    </header>
+
+    <section class="progress-wrap" aria-label="Game progress">
+      <div class="progress-copy"><span id="progress-label">WELCOME TO THE KITCHEN</span><span id="progress-count">READY WHEN YOU ARE</span></div>
+      <div class="progress-track" role="progressbar" aria-label="Cooking progress" aria-valuemin="0" aria-valuemax="6" aria-valuenow="0" id="progress-bar"><span id="progress-fill"></span></div>
+      <nav class="stage-dots" id="stage-dots" aria-label="Cooking stages"></nav>
+    </section>
+
+    <main id="game" class="game-frame" aria-live="polite">
+      <div id="stage-view"></div>
+    </main>
+
+    <footer class="site-footer"><span>Made slowly. Served warm.</span><span>GYUDON KITCHEN <i aria-hidden="true">·</i> いただきます</span></footer>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="how-dialog" class="how-dialog" aria-labelledby="how-title">
+    <div class="dialog-head"><span class="eyebrow">A NOTE FROM THE KITCHEN</span><button class="icon-button dialog-close" type="button" aria-label="Close how to play">×</button></div>
+    <h2 id="how-title">How to play</h2>
+    <p>Follow the little prompts from counter to table. Tap, click, or use Tab and Enter to interact. On the onion board, use the arrow keys to position your knife and Space to slice.</p>
+    <p>Choose a pace that feels right: Easy gives more forgiving timing and visible hints, Normal is balanced, and Chef keeps the hints tucked away.</p>
+    <p>Every stage can be retried without losing the rest of your bowl. There is no rush except the gentle simmer timer.</p>
+    <button class="button button-primary dialog-done" type="button">Got it</button>
+  </dialog>
+</body>
+</html>

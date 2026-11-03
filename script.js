@@ -2,24 +2,24 @@
 const RECIPE = {
   stages: ["Gather", "Rice", "Warishita", "Onion", "Beef", "Serve"],
   coreIngredients: [
-    { id: "beef", english: "Thinly sliced beef", japanese: "薄切り牛肉 · usugiri gyuniku", icon: "🥩", note: "Ribeye or chuck" },
-    { id: "onion", english: "Yellow onion", japanese: "玉ねぎ · tamanegi", icon: "🧅", note: "One medium" },
-    { id: "rice", english: "Short-grain rice", japanese: "米 · kome", icon: "🍚", note: "Japanese rice" },
-    { id: "dashi", english: "Dashi stock", japanese: "だし · dashi", icon: "🍵", note: "The savory base" },
-    { id: "soy", english: "Soy sauce", japanese: "醤油 · shoyu", icon: "🫙", note: "2 tablespoons" },
-    { id: "mirin", english: "Mirin", japanese: "みりん · mirin", icon: "🍶", note: "Gentle sweetness" },
-    { id: "sake", english: "Cooking sake", japanese: "酒 · sake", icon: "🍶", note: "1 tablespoon" },
-    { id: "sugar", english: "Sugar", japanese: "砂糖 · satō", icon: "🧂", note: "Just a little" }
+    { id: "beef", english: "Thinly sliced beef", japanese: "薄切り牛肉 · usugiri gyuniku", note: "Ribeye or chuck" },
+    { id: "onion", english: "Yellow onion", japanese: "玉ねぎ · tamanegi", note: "One medium" },
+    { id: "rice", english: "Short-grain rice", japanese: "米 · kome", note: "Japanese rice" },
+    { id: "dashi", english: "Dashi stock", japanese: "だし · dashi", note: "The savory base" },
+    { id: "soy", english: "Soy sauce", japanese: "醤油 · shoyu", note: "2 tablespoons" },
+    { id: "mirin", english: "Mirin", japanese: "みりん · mirin", note: "Gentle sweetness" },
+    { id: "sake", english: "Cooking sake", japanese: "酒 · sake", note: "1 tablespoon" },
+    { id: "sugar", english: "Sugar", japanese: "砂糖 · satō", note: "Just a little" }
   ],
   toppings: [
-    { id: "ginger", english: "Pickled red ginger", japanese: "紅生姜 · beni shoga", icon: "🌺", note: "Bright and tangy" },
-    { id: "scallion", english: "Green onion", japanese: "青ねぎ · ao-negi", icon: "🌿", note: "Freshly sliced" },
-    { id: "shichimi", english: "Seven-spice chili", japanese: "七味唐辛子 · shichimi", icon: "🌶️", note: "A warm little kick" },
-    { id: "egg", english: "Raw or onsen egg", japanese: "温泉卵 · onsen tamago", icon: "🥚", note: "Silky and rich" }
+    { id: "ginger", english: "Pickled red ginger", japanese: "紅生姜 · beni shoga", note: "Bright and tangy" },
+    { id: "scallion", english: "Green onion", japanese: "青ねぎ · ao-negi", note: "Freshly sliced" },
+    { id: "shichimi", english: "Seven-spice chili", japanese: "七味唐辛子 · shichimi", note: "A warm little kick" },
+    { id: "egg", english: "Raw or onsen egg", japanese: "温泉卵 · onsen tamago", note: "Silky and rich" }
   ],
   decoys: [
-    { id: "ketchup", english: "Ketchup", japanese: "トマトケチャップ", icon: "🍅", note: "A different kitchen" },
-    { id: "cream", english: "Heavy cream", japanese: "生クリーム", icon: "🥛", note: "Not for this bowl" }
+    { id: "ketchup", english: "Ketchup", japanese: "トマトケチャップ", note: "A different kitchen" },
+    { id: "cream", english: "Heavy cream", japanese: "生クリーム", note: "Not for this bowl" }
   ],
   sauceOrder: ["dashi", "sake", "mirin", "sugar", "soy"],
   sauceLabels: { dashi: "Dashi", sake: "Sake", mirin: "Mirin", sugar: "Sugar", soy: "Soy sauce" },
@@ -61,6 +61,35 @@ const progressCount = document.querySelector("#progress-count");
 const dots = document.querySelector("#stage-dots");
 const toast = document.querySelector("#toast");
 let audioContext;
+
+const STAGE_HINTS = {
+  1: "The eight essentials make the bowl; the four toppings are yours to choose.",
+  2: "A cup of rice likes about 1.2 cups of water. The rinse meter needs a few swishes.",
+  3: "Let dashi lead, then layer sake, mirin, sugar, and shoyu. Aim for the marker near the middle.",
+  4: "Space the five cuts evenly. Medium heat gives the onion time to turn translucent.",
+  5: "Separate every piece before simmering; the green window is the tender moment.",
+  6: "A little sauce over the rice helps the beef settle in. Simple toppings work beautifully."
+};
+
+function ingredientIcon(id) {
+  const drawings = {
+    beef: '<path d="M10 23c4-11 20-16 30-8 7 6 3 17-5 20-10 4-23 0-25-7-1-2-1-3 0-5Z" fill="#a95e40"/><path d="M15 24c5-5 12-7 19-6m-15 12c5-3 10-4 16-3" fill="none" stroke="#e1a27b" stroke-width="3" stroke-linecap="round"/>',
+    onion: '<path d="M25 11c-2-5 1-7 4-9m4 10c0-5 3-7 6-8" fill="none" stroke="#64804f" stroke-width="3" stroke-linecap="round"/><path d="M30 11C17 16 13 24 17 33c3 7 21 9 27-1 5-9-2-18-14-21Z" fill="#e6d5aa" stroke="#b89b72" stroke-width="2"/><path d="M30 14c-7 5-9 12-7 19m7-19c5 7 6 13 4 21m3-17c5 5 5 9 3 14" fill="none" stroke="#c5ac83" stroke-width="2"/>',
+    rice: '<path d="M11 26h34l-4 11a5 5 0 0 1-5 3H20a5 5 0 0 1-5-3l-4-11Z" fill="#fff8e9" stroke="#a89072" stroke-width="2"/><path d="M16 25c3-8 8-10 12-5 5-7 12-5 16 5" fill="#f2ead8" stroke="#c5b99f" stroke-width="2"/><path d="M22 22v-5m7 4v-6m7 7v-5" stroke="#d5c9ad" stroke-width="2" stroke-linecap="round"/>',
+    dashi: '<path d="M17 16h22l-2 20a4 4 0 0 1-4 4h-9a4 4 0 0 1-4-4l-3-20Z" fill="#f3e5c4" stroke="#8d806b" stroke-width="2"/><path d="M19 24h18" stroke="#b99763" stroke-width="3"/><path d="M23 13c-2-4 1-6 2-8m8 8c-2-4 1-6 2-8" fill="none" stroke="#8c9d79" stroke-width="2" stroke-linecap="round"/>',
+    soy: '<path d="M26 8h9v6l4 4v17a5 5 0 0 1-5 5h-7a5 5 0 0 1-5-5V18l4-4V8Z" fill="#8b593b" stroke="#6e4b37" stroke-width="2"/><path d="M26 8h9m-12 15h15" stroke="#eed8b2" stroke-width="2"/>',
+    mirin: '<path d="M25 8h10v6l4 5v16a5 5 0 0 1-5 5h-8a5 5 0 0 1-5-5V19l4-5V8Z" fill="#dda75e" stroke="#92734b" stroke-width="2"/><path d="M25 8h10m-13 17h17" stroke="#fff0c8" stroke-width="2"/>',
+    sake: '<path d="M25 8h10v6l4 5v16a5 5 0 0 1-5 5h-8a5 5 0 0 1-5-5V19l4-5V8Z" fill="#efe5cc" stroke="#927f63" stroke-width="2"/><path d="M25 8h10m-13 17h17" stroke="#b8a98b" stroke-width="2"/>',
+    sugar: '<path d="m14 21 11-7 10 5-11 7-10-5Zm10 8 11-7 8 5-11 7-8-5Zm-10 2 7-5 8 5-7 5-8-5Z" fill="#fff9e9" stroke="#b3a78e" stroke-width="2" stroke-linejoin="round"/>',
+    ginger: '<path d="M15 31c6-11 15-17 26-18-2 12-9 21-21 25-5 1-8-3-5-7Z" fill="#d65f58"/><path d="M18 33c6-7 12-12 20-16m-14 17 15-12" stroke="#f5b0a3" stroke-width="2" stroke-linecap="round"/>',
+    scallion: '<path d="M15 38 31 11m-9 30 18-31m-7 31 7-19" fill="none" stroke="#67834f" stroke-width="5" stroke-linecap="round"/><path d="m15 38 5-8m5 11 4-8" stroke="#efe8d4" stroke-width="5" stroke-linecap="round"/>',
+    shichimi: '<path d="M16 25h28l-3 13a5 5 0 0 1-5 4H24a5 5 0 0 1-5-4l-3-13Z" fill="#b9583e" stroke="#83533e" stroke-width="2"/><path d="m22 22 3-4m7 4 2-5m4 5 3-4" stroke="#d99a58" stroke-width="3" stroke-linecap="round"/><circle cx="25" cy="31" r="2" fill="#f1d5a2"/><circle cx="34" cy="35" r="2" fill="#e8ba70"/>',
+    egg: '<ellipse cx="30" cy="27" rx="17" ry="21" fill="#fff7e6" stroke="#b99e72" stroke-width="2"/><circle cx="32" cy="29" r="7" fill="#dfa742"/><circle cx="29" cy="26" r="2" fill="#f5d276"/>',
+    ketchup: '<path d="M24 10h13v6l4 5v15a5 5 0 0 1-5 5h-9a5 5 0 0 1-5-5V21l4-5v-6Z" fill="#cc573e" stroke="#8e4637" stroke-width="2"/><path d="M24 10h13m-13 16h17" stroke="#f5d2af" stroke-width="2"/>',
+    cream: '<path d="M19 14h22v26H19z" fill="#f1ead8" stroke="#9f927c" stroke-width="2"/><path d="M19 14h22l-3-6H22l-3 6Z" fill="#fff8e8" stroke="#9f927c" stroke-width="2"/><path d="M23 24h14m-14 5h10" stroke="#b69b70" stroke-width="2" stroke-linecap="round"/>'
+  };
+  return `<svg viewBox="0 0 60 50" aria-hidden="true">${drawings[id] || drawings.rice}</svg>`;
+}
 
 function escapeHTML(value) {
   return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
@@ -140,6 +169,7 @@ function render() {
   bindStageEvents();
 }
 
+// Stage rendering and small cooking-game mechanics.
 function renderTitle() {
   return `<section class="title-layout" aria-labelledby="game-title">
     <div class="title-copy"><span class="eyebrow">A COZY LITTLE COOKING GAME</span><h1 id="game-title">Make a bowl.<br><em>Make it yours.</em></h1>
@@ -157,7 +187,8 @@ function stageHead(number, title, instruction) {
 }
 
 function hintMarkup() {
-  return `<p class="hint-box" role="status">${state.hint ? escapeHTML(state.hint) : ""}</p>`;
+  const hint = state.hint || (state.difficulty === "easy" ? STAGE_HINTS[state.screen] : "");
+  return `<p class="hint-box" role="status">${hint ? escapeHTML(hint) : ""}</p>`;
 }
 
 function stageActions(canContinue, continueLabel = "Continue", action = "next") {
@@ -172,12 +203,13 @@ function renderIngredients() {
     <div class="kitchen-columns"><div class="ingredient-grid" aria-label="Ingredient counter">${items.map((item) => {
       const selected = state.picked.includes(item.id);
       const decoy = RECIPE.decoys.some((entry) => entry.id === item.id);
-      return `<button class="ingredient-card ${selected ? "is-picked" : ""}" data-item="${item.id}" aria-label="${escapeHTML(item.english)}${selected ? ", collected" : ""}" ${selected ? "disabled" : ""}><span class="ingredient-icon" aria-hidden="true">${item.icon}</span><span class="ingredient-name">${escapeHTML(item.english)}</span><span class="ingredient-tag">${escapeHTML(item.note)}</span>${selected ? '<span class="ingredient-mark" aria-hidden="true">✓</span>' : ""}${decoy ? '<span class="sr-only">Decoy</span>' : ""}</button>`;
+      return `<button class="ingredient-card ${selected ? "is-picked" : ""}" data-item="${item.id}" aria-label="${escapeHTML(item.english)}${selected ? ", collected" : ""}" ${selected ? "disabled" : ""}><span class="ingredient-icon">${ingredientIcon(item.id)}</span><span class="ingredient-name">${escapeHTML(item.english)}</span><span class="ingredient-tag">${escapeHTML(item.note)}</span>${selected ? '<span class="ingredient-mark" aria-hidden="true">✓</span>' : ""}${decoy ? '<span class="sr-only">Decoy</span>' : ""}</button>`;
     }).join("")}</div>
     <aside class="panel side-note"><span class="eyebrow">ON THE COUNTER</span><h3>${required} / 8 essentials</h3><p>Beef, onion, rice, and the five-part sauce are the heart of this bowl. Toppings are a lovely extra.</p><div class="picked-list">${pickedNames.length ? pickedNames.map((name) => `<span class="picked-chip">${escapeHTML(name)}</span>`).join("") : '<span class="ingredient-tag">Nothing picked up yet</span>'}</div></aside></div>
     ${hintMarkup()}${stageActions(required === 8)}`;
 }
 
+// Rice clarity and water measurement are tracked separately for scoring.
 function renderRice() {
   const cooked = state.rice.cooked;
   const cooking = state.rice.cooking;
@@ -189,7 +221,7 @@ function renderRice() {
       <div class="slider-row"><div class="meter-label"><label for="water-amount">Water for 1 cup dry rice</label><output id="water-output">${Number(state.rice.water).toFixed(1)} cups</output></div><input id="water-amount" type="range" min="0.8" max="1.6" step="0.05" value="${state.rice.water}" aria-label="Water amount in cups"><div class="slider-readout"><span>0.8 cup</span><span>1.6 cups</span></div></div>
     </section><div class="cook-pot ${cooked ? "" : ""}" role="img" aria-label="A lidded pot of rice ${cooked ? "ready" : "waiting to cook"}"><div class="pot-shape"><span class="pot-content"><i></i><i></i><i></i></span></div></div></div>
     <p class="feedback" role="status">${cooked ? "The rice is ready: tender, glossy, and waiting in its pot." : cooking ? "The rice cooker is doing its quiet work." : state.rice.rinse >= 100 ? "Clear as a little mountain stream. Set the water and start the cooker." : "A few more swishes will clear the cloudy starch."}</p>
-    ${hintMarkup()}${stageActions(cooked, cooked ? "Rice is ready" : cooking ? "Cooking…" : "Cook the rice", "cook-rice")}`;
+    ${hintMarkup()}${stageActions(cooked || (!cooking && state.rice.rinse >= 100), cooked ? "Rice is ready" : cooking ? "Cooking…" : "Cook the rice", cooked ? "next" : "cook-rice")}`;
 }
 
 function sauceRatio() {
@@ -206,6 +238,7 @@ function ratioText() {
   return "Just right · sweet, savory, and full of umami.";
 }
 
+// Warishita uses a fixed ingredient order, then exposes sweet/savory tuning.
 function renderSauce() {
   const ratio = sauceRatio();
   const marker = Math.max(3, Math.min(97, 50 + (ratio - RECIPE.sauceTargetRatio) * 78));
@@ -224,6 +257,7 @@ function renderSauce() {
     ${hintMarkup()}${stageActions(orderDone, "Simmer the onions next")}`;
 }
 
+// Compare all slice gaps, including the two ends of the onion, to a uniform cut.
 function onionEvenness() {
   if (state.onion.cuts.length < 2) return 0;
   const positions = [...state.onion.cuts].sort((a, b) => a - b);
@@ -271,15 +305,19 @@ function renderBeef() {
 }
 
 function renderBowl(toppings = state.plate.toppingSelected) {
-  const hasTopping = toppings.length > 0;
-  return `<div class="final-bowl" id="serve-bowl" draggable="true" role="img" aria-label="Gyudon bowl. Drag to the table to serve."><span class="final-rice"></span><span class="final-beef"></span>${hasTopping ? '<span class="final-topping"></span><span class="final-onion"></span>' : ""}${toppings.includes("egg") ? '<span class="final-egg"></span>' : ""}</div>`;
+  const ginger = toppings.includes("ginger");
+  const scallion = toppings.includes("scallion");
+  const spice = toppings.includes("shichimi");
+  const toppingNames = toppings.map((id) => RECIPE.toppings.find((item) => item.id === id)?.english).filter(Boolean);
+  const label = toppingNames.length ? `with ${toppingNames.join(", ")}` : "with no extra toppings";
+  return `<div class="final-bowl" id="serve-bowl" draggable="true" role="img" aria-label="Gyudon bowl ${label}. Drag to the table to serve."><span class="final-rice"></span><span class="final-beef"></span>${ginger ? '<span class="final-topping"></span>' : ""}${spice ? '<span class="final-spice"></span>' : ""}${scallion ? '<span class="final-onion"></span>' : ""}${toppings.includes("egg") ? '<span class="final-egg"></span>' : ""}</div>`;
 }
 
 function renderPlate() {
   const toppingOptions = RECIPE.toppings.filter((item) => state.picked.includes(item.id));
   return `${stageHead(6, "A bowl, made your way", "Scoop rice, lay the beef and onions over top with a little sauce, add any toppings you like, and bring your bowl to the table.")}
     <div class="plate-layout"><section class="panel workbench"><h3>Build your gyudon</h3><div class="button-row"><button class="button button-secondary button-small" data-action="scoop-rice" ${state.plate.rice ? "disabled" : ""}>${state.plate.rice ? "Rice scooped ✓" : "Scoop the rice"}</button><button class="button button-secondary button-small" data-action="add-beef-plate" ${!state.plate.rice || state.plate.beef ? "disabled" : ""}>${state.plate.beef ? "Beef & sauce added ✓" : "Ladle beef & sauce"}</button></div>
-      <h3 style="margin-top:22px">A little something extra</h3><div class="topping-options">${toppingOptions.length ? toppingOptions.map((item) => `<label class="topping-choice"><input type="checkbox" data-topping="${item.id}" ${state.plate.toppingSelected.includes(item.id) ? "checked" : ""}><span>${item.icon} ${escapeHTML(item.english)} <span class="ingredient-tag">${escapeHTML(item.japanese)}</span></span></label>`).join("") : '<span class="ingredient-tag">No toppings gathered. A simple bowl is lovely, too.</span>'}</div>
+      <h3 style="margin-top:22px">A little something extra</h3><div class="topping-options">${toppingOptions.length ? toppingOptions.map((item) => `<label class="topping-choice"><input type="checkbox" data-topping="${item.id}" ${state.plate.toppingSelected.includes(item.id) ? "checked" : ""}><span class="topping-icon">${ingredientIcon(item.id)}</span><span>${escapeHTML(item.english)} <span class="ingredient-tag">${escapeHTML(item.japanese)}</span></span></label>`).join("") : '<span class="ingredient-tag">No toppings gathered. A simple bowl is lovely, too.</span>'}</div>
       <button class="button button-primary button-small" data-action="serve" ${!state.plate.rice || !state.plate.beef || state.plate.served ? "disabled" : ""}>${state.plate.served ? "Served with care ✓" : "Place bowl on the table"}</button>
     </section><section class="panel workbench"><h3>The finishing touch</h3><div class="plating-zone" id="plating-zone" aria-label="Table for your gyudon bowl">${renderBowl()}</div><p class="feedback" role="status">${state.plate.served ? "Itadakimasu! Your bowl is ready." : "You can drag the bowl to the table, or use the serve button."}</p></section></div>
     ${hintMarkup()}${stageActions(state.plate.served, "See your bowl")}`;
@@ -294,7 +332,12 @@ function feedbackLine() {
   const scores = Object.entries(state.scores).sort((a, b) => a[1] - b[1]);
   if (scores.every(([, value]) => value >= 90)) return "A beautifully balanced bowl. Every little detail found its place.";
   const [lowest, value] = scores[0] || ["rice", 0];
-  if (lowest === "beef") return value >= 65 ? "The sauce is lovely; a few seconds less would keep the beef extra tender." : "Next time, trust the gentle simmer and lift the beef in its green window.";
+  if (lowest === "beef") {
+    const midpoint = (timingWindow().start + timingWindow().end) / 2;
+    return state.beef.elapsed < midpoint
+      ? "The sauce is lovely; a few more seconds would bring the beef into its tender window."
+      : "The sauce is lovely; lifting the beef a little sooner would keep it extra tender.";
+  }
   if (lowest === "sauce") return "A cozy bowl, with room to bring the sweet and savory notes closer together.";
   if (lowest === "onion") return "The onions brought sweetness; more even slices would soften at the same pace.";
   if (lowest === "rice") return "The beef is the star; a clearer rinse and careful water measure make rice shine.";
@@ -304,17 +347,20 @@ function feedbackLine() {
 function renderEnd() {
   const score = finalScore();
   const stars = Math.max(1, Math.min(5, Math.ceil(score / 20)));
+  const endToppings = RECIPE.toppings.filter((item) => state.plate.toppingSelected.includes(item.id));
+  const toppingDescription = endToppings.length ? endToppings.map((item) => item.english).join(", ") : "no extra toppings";
   const scores = [
     ["ingredients", "Ingredient gathering"], ["rice", "Rice preparation"], ["sauce", "Sauce balance"],
     ["onion", "Onion slicing & simmer"], ["beef", "Beef timing & aku"], ["presentation", "Presentation"]
   ];
-  return `<section class="end-layout"><div class="end-art" role="img" aria-label="A finished bowl of gyudon with rice, tender beef, red ginger, and green onion">${renderBowl(RECIPE.toppings.filter((item) => state.plate.toppingSelected.includes(item.id)).map((item) => item.id))}</div><div><span class="eyebrow">YOUR LITTLE MASTERPIECE</span><h2>One warm bowl,<br>made by you.</h2><div class="score-number">${score}<small> / 100</small></div><div class="stars" aria-label="${stars} out of 5 stars">${"★".repeat(stars)}${"☆".repeat(5 - stars)}</div><p class="lead" style="font-size:16px">${escapeHTML(feedbackLine())}</p>
+  return `<section class="end-layout"><div class="end-art" role="img" aria-label="A finished bowl of gyudon with rice, tender beef, and ${escapeHTML(toppingDescription)}">${renderBowl(endToppings.map((item) => item.id))}</div><div><span class="eyebrow">YOUR LITTLE MASTERPIECE</span><h2>One warm bowl,<br>made by you.</h2><div class="score-number">${score}<small> / 100</small></div><div class="stars" aria-label="${stars} out of 5 stars">${"★".repeat(stars)}${"☆".repeat(5 - stars)}</div><p class="lead" style="font-size:16px">${escapeHTML(feedbackLine())}</p>
     <div class="score-list" aria-label="Score by stage">${scores.map(([key, label]) => `<div class="score-row"><span>${label}</span><strong>${Math.round(state.scores[key] || 0)}</strong><div class="meter"><span style="width:${Math.round(state.scores[key] || 0)}%"></span></div></div>`).join("")}</div>
     <aside class="learned"><h3>What you learned</h3><ul><li>Gyudon is a beloved Japanese fast-food and home-cooking staple.</li><li>Warishita brings dashi, shoyu, sake, mirin, and sugar together.</li><li>Onion turns soft and sweet in the simmering sauce.</li><li>Skimming aku and lifting beef as soon as it is no longer pink helps keep it tender.</li></ul></aside>
     <button class="button button-primary" data-action="play-again">Cook another bowl <span aria-hidden="true">↻</span></button></div></section>`;
 }
 
 function addRinse(amount = 12) {
+  // Each swish clears surface starch until the water reaches the clear mark.
   state.rice.rinse = Math.min(100, state.rice.rinse + amount);
   render();
   playTone(480 + state.rice.rinse * 1.2);
@@ -322,15 +368,7 @@ function addRinse(amount = 12) {
 
 function setHint() {
   if (state.difficulty === "chef") return;
-  const hints = {
-    1: "The eight essentials make the bowl; the four toppings are yours to choose.",
-    2: "A cup of rice likes about 1.2 cups of water. The rinse meter needs a few swishes.",
-    3: "Let dashi lead, then layer sake, mirin, sugar, and shoyu. Aim for the marker near the middle.",
-    4: "Space the five cuts evenly. Medium heat gives the onion time to turn translucent.",
-    5: "Separate every piece before simmering; the green window is the tender moment.",
-    6: "A little sauce over the rice helps the beef settle in. Simple toppings work beautifully."
-  };
-  state.hint = hints[state.screen] || "Take it one gentle step at a time.";
+  state.hint = STAGE_HINTS[state.screen] || "Take it one gentle step at a time.";
   render();
 }
 
@@ -391,6 +429,7 @@ function scorePresentation() {
   return Math.round(75 + toppings);
 }
 
+// Bind native controls plus the onion board and bowl drag/drop gestures.
 function bindStageEvents() {
   view.querySelectorAll("[data-action]").forEach((element) => {
     element.addEventListener("click", (event) => handleAction(element.dataset.action, element, event));
@@ -420,6 +459,13 @@ function bindStageEvents() {
     render();
   }));
   const water = view.querySelector("#water-amount");
+  const riceBasin = view.querySelector(".rice-basin");
+  riceBasin?.addEventListener("keydown", (event) => {
+    if ((event.key === "Enter" || event.key === " ") && state.rice.rinse < 100 && !state.rice.cooking && !state.rice.cooked) {
+      event.preventDefault();
+      addRinse(14);
+    }
+  });
   water?.addEventListener("input", () => {
     state.rice.water = Number(water.value);
     view.querySelector("#water-output").textContent = `${state.rice.water.toFixed(2)} cups`;
@@ -551,6 +597,7 @@ function handleAction(action, element, event) {
   if (action === "serve") { serveBowl(); return; }
 }
 
+// Run a short real-time window so players can lift the beef at the right moment.
 function startBeefTimer() {
   const window = timingWindow();
   state.beef.elapsed = 0;
